@@ -1,0 +1,23 @@
+
+{
+	"name": "SuRaMoN/mime-mail-parser",
+	"description": "Fork of valinskis mime-mail-parser with additional bugfixes and features",
+	"type": "library",
+	"homepage": "https://github.com/SuRaMoN/mime-mail-parser",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "SuRaMoN",
+			"homepage": "https://github.com/SuRaMoN"
+		},
+		{
+			"name": "Valenski",
+			"homepage": "https://code.google.com/p/php-mime-mail-parser/"
+		}
+	],
+	"require": { "php": ">=5.3" },
+	"autoload": {
+		"files": [ "autoload.php" ]
+	}
+}
+

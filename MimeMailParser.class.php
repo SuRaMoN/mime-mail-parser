@@ -438,7 +438,11 @@ class MimeMailParser {
 	private function getAttachmentStream(&$part) {
 		$temp_fp = tmpfile();
 
-        array_key_exists('content-transfer-encoding', $part['headers']) ? $encoding = $part['headers']['content-transfer-encoding'] : $encoding = '';
+		if(array_key_exists('content-transfer-encoding', $part['headers'])) {
+			$encoding = $part['headers']['content-transfer-encoding'];
+		} else {
+			$encoding = '';
+		}
 
 		if ($temp_fp) {
 			if ($this->stream) {
@@ -446,16 +450,10 @@ class MimeMailParser {
 				$end = $part['ending-pos-body'];
 				fseek($this->stream, $start, SEEK_SET);
 				$len = $end-$start;
-				$written = 0;
-				$write = 2028;
-				$body = '';
-				while($written < $len) {
-					if (($written+$write < $len )) {
-						$write = $len - $written;
-					}
-					$part = fread($this->stream, $write);
-					fwrite($temp_fp, $this->decode($part, $encoding));
-					$written += $write;
+				$filter = $this->applyDecodeFilter($temp_fp, $encoding);
+				stream_copy_to_stream($this->stream, $temp_fp, $len);
+				if($filter !== null) {
+					stream_filter_remove($filter);
 				}
 			} else if ($this->data) {
 				$attachment = $this->decode($this->getPartBodyFromText($part), $encoding);
@@ -469,6 +467,16 @@ class MimeMailParser {
 		return $temp_fp;
 	}
 
+	protected function applyDecodeFilter($stream, $encoding)
+	{
+		switch(strtolower($encoding)) {
+			case 'base64':
+				return stream_filter_append($stream, 'convert.base64-decode', STREAM_FILTER_WRITE);
+			case 'quoted-printable':
+				return stream_filter_append($stream, 'convert.quoted-printable-decode', STREAM_FILTER_WRITE);
+		}
+		return null;
+	}
 
     /**
      * Decode the string depending on encoding type.
@@ -488,5 +496,3 @@ class MimeMailParser {
 
 }
 
-
-?>

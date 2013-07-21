@@ -106,15 +106,27 @@ class MimeMailParser_attachment {
 	 * @return String
 	 */
 	public function getContent() {
-		if ($this->content === null) {
-			fseek($this->stream, 0);
-			while(($buf = $this->read()) !== false) { 
-				$this->content .= $buf; 
-			}
+		if ($this->content !== null) {
+			return $this->content;
 		}
-		return $this->content;
+		fseek($this->stream, 0);
+		return stream_get_contents($this->stream);
 	}
 	
+	public function getContentLength()
+	{
+		fseek($this->stream, 0, SEEK_END);
+		return ftell($this->stream);
+	}
+
+	public function getHeader($headerName)
+	{
+		if(!array_key_exists($headerName, $this->headers)) {
+			return '';
+		}
+		return $this->headers[$headerName];
+	}
+
 	/**
 	 * Allow the properties 
 	 * 	MimeMailParser_attachment::$name,
@@ -133,4 +145,3 @@ class MimeMailParser_attachment {
 	
 }
 
-?>

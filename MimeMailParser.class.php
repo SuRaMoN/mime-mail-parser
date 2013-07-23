@@ -254,26 +254,37 @@ class MimeMailParser {
 	 */
 	public function getAttachments() {
 		$attachments = array();
-		$dispositions = array("attachment","inline");
 		foreach($this->parts as $part) {
-			$disposition = $this->getPartContentDisposition($part);
-
-			if (in_array($disposition, $dispositions) === TRUE) {
-				if (isset($part['disposition-filename']) === FALSE) {
-					$part['disposition-filename'] = md5(uniqid());
-				}
-
-				$attachments[] = new MimeMailParser_attachment(
-					$part['disposition-filename'],
-					$this->getPartContentType($part),
-					$this->getAttachmentStream($part),
-					$disposition,
-					$this->getPartHeaders($part)
-				);
+			if(!$this->isPartAttachment($part)) {
+				continue;
 			}
+
+			if (!isset($part['disposition-filename'])) {
+				$part['disposition-filename'] = md5(uniqid(true));
+			}
+
+			$attachments[] = new MimeMailParser_attachment(
+				$part['disposition-filename'],
+				$this->getPartContentType($part),
+				$this->getAttachmentStream($part),
+				$this->getPartContentDisposition($part),
+				$this->getPartHeaders($part)
+			);
 		}
 
 		return $attachments;
+	}
+
+	protected function isPartAttachment($part)
+	{
+		$disposition = $this->getPartContentDisposition($part);
+		if(in_array($disposition, array('attachment', 'inline'))) {
+			return true;
+		}
+		if(isset($part['content-id'])) {
+			return true;
+		}
+		return false;
 	}
 
 	/**

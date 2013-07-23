@@ -72,6 +72,13 @@ class MimeMailParser_attachment {
 	public function getHeaders() {
 		return $this->headers;
 	}
+
+	public function getContentId()
+	{
+		$id = $this->getHeader('content-id');
+		$id = preg_replace('/^<(.*)>$/', '\1', $id);
+		return $id;
+	}
 	
 	/**
 	 * Retrieve the file extension

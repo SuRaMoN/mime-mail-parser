@@ -1,6 +1,6 @@
 
 {
-	"name": "SuRaMoN/mime-mail-parser",
+	"name": "suramon/mime-mail-parser",
 	"description": "Fork of valinskis mime-mail-parser with additional bugfixes and features",
 	"type": "library",
 	"homepage": "https://github.com/SuRaMoN/mime-mail-parser",
